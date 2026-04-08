@@ -12,6 +12,15 @@ export function addCalendarMonths(year, month, deltaMonths) {
 /**
  * @param {number} year
  * @param {number} month - 1–12
+ */
+export function getMonthName(year, month, locale = undefined) {
+  const date = new Date(year, month - 1, 1)
+  return date.toLocaleDateString(locale ?? undefined, { month: 'long' })
+}
+
+/**
+ * @param {number} year
+ * @param {number} month - 1–12
  * @param {Intl.DateTimeFormatOptions} [opts]
  */
 export function formatMonthYearHeading(year, month, locale = undefined, opts) {

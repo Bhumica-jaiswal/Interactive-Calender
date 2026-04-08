@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { cx } from '../utils/cx.js'
 
 const TRANSITION_CLASSES =
   'transition-[transform,background-color,color,box-shadow,border-color,ring-color] duration-200 ease-out motion-reduce:transform-none motion-reduce:transition-none'
@@ -121,9 +122,7 @@ function DayCellInner({
   return (
     <button
       type="button"
-      className={[baseInteractive, roundedByRole, borderBase, layerStyleClasses, todayRing]
-        .filter(Boolean)
-        .join(' ')}
+      className={cx(baseInteractive, roundedByRole, borderBase, layerStyleClasses, todayRing)}
       aria-label={ariaLabel}
       aria-pressed={isHighlighted}
       onClick={() => onDateClick?.(date)}
@@ -131,37 +130,37 @@ function DayCellInner({
     >
       <div className="flex w-full items-center justify-between">
         <span
-          className={[
+          className={cx(
             'text-[13px] font-semibold leading-none sm:text-sm',
             TRANSITION_CLASSES,
             labelLight ? 'text-white' : 'text-zinc-900/90 group-hover:text-zinc-900',
-          ].join(' ')}
+          )}
         >
           {label}
         </span>
         <span
-          className={[
+          className={cx(
             'inline-flex h-2 w-2 rounded-full opacity-0 transition-opacity duration-200 ease-out motion-reduce:transition-none',
             'group-hover:scale-110 group-hover:opacity-100 motion-reduce:group-hover:scale-100',
             labelLight ? 'bg-white/60' : 'bg-zinc-400',
-          ].join(' ')}
+          )}
         />
       </div>
 
       <div
-        className={[
+        className={cx(
           'mt-1 h-5 w-full rounded-lg sm:mt-2 sm:h-7 sm:rounded-xl',
           TRANSITION_CLASSES,
           isHighlighted ? 'opacity-0' : 'bg-zinc-100/70 opacity-0 group-hover:opacity-100',
-        ].join(' ')}
+        )}
       />
 
       {hasNote ? (
         <span
-          className={[
+          className={cx(
             'pointer-events-none absolute bottom-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-amber-500 shadow-sm transition-opacity duration-200 sm:bottom-1.5',
             labelLight ? 'ring-2 ring-white/70' : 'ring-2 ring-white',
-          ].join(' ')}
+          )}
           aria-hidden
         />
       ) : null}

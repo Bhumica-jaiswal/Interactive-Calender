@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { DayCell } from './DayCell.jsx'
 import { buildCalendarMonth } from '../utils/buildCalendarMonth.js'
+import { cx } from '../utils/cx.js'
 import {
   getRangeBoundaryRole,
   isSameCalendarDay,
@@ -40,9 +41,7 @@ export function CalendarGrid({
     <section className="mt-4 min-w-0 overflow-hidden [perspective:1200px] md:mt-6">
       <div
         key={`${year}-${month}`}
-        className={['origin-top transform-gpu [backface-visibility:hidden]', enterClass]
-          .filter(Boolean)
-          .join(' ')}
+        className={cx('origin-top transform-gpu [backface-visibility:hidden]', enterClass)}
       >
         <div className="grid grid-cols-7 gap-1.5 sm:gap-2 md:gap-2.5">
           {WEEKDAYS.map((d) => (

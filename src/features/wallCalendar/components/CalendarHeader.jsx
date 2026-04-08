@@ -1,3 +1,6 @@
+import { useMemo } from 'react'
+import { getMonthName } from '../utils/calendarView.js'
+
 function IconChevronLeft(props) {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" {...props}>
@@ -23,15 +26,18 @@ function IconChevronRight(props) {
 }
 
 export function CalendarHeader({ year, month, onPrevMonth, onNextMonth }) {
-  const view = new Date(year, month - 1, 1)
-  const monthName = view.toLocaleDateString(undefined, { month: 'long' })
+  const monthName = useMemo(() => getMonthName(year, month), [year, month])
   const heading = `${monthName} ${year}`
-  const todayLabel = new Date().toLocaleDateString(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
+  const todayLabel = useMemo(
+    () =>
+      new Date().toLocaleDateString(undefined, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }),
+    [],
+  )
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
