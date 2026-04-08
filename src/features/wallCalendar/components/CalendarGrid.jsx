@@ -1,10 +1,24 @@
 import { DayCell } from './DayCell.jsx'
 import { buildCalendarMonth } from '../utils/buildCalendarMonth.js'
+import {
+  getRangeBoundaryRole,
+  isSameCalendarDay,
+  orderRangeEdges,
+} from '../utils/calendarDates.js'
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-export function CalendarGrid({ year, month }) {
+export function CalendarGrid({
+  year,
+  month,
+  startDate,
+  endDate,
+  hoverDate,
+  onDateClick,
+  onDateHover,
+}) {
   const cells = buildCalendarMonth(year, month)
+  const today = new Date()
 
   return (
     <section className="mt-6">
@@ -19,7 +33,10 @@ export function CalendarGrid({ year, month }) {
         ))}
       </div>
 
-      <div className="mt-2 grid grid-cols-7 gap-2">
+      <div
+        className="mt-2 grid grid-cols-7 gap-2"
+        onPointerLeave={() => onDateHover?.(null)}
+      >
         {cells.map((cell) => {
           if (cell.kind === 'padding') {
             return (
@@ -30,7 +47,36 @@ export function CalendarGrid({ year, month }) {
               />
             )
           }
-          return <DayCell key={cell.key} date={cell.date} />
+
+          const { date } = cell
+
+          let confirmedRole = null
+          if (startDate && endDate) {
+            confirmedRole = getRangeBoundaryRole(date, startDate, endDate)
+          }
+
+          let previewRole = null
+          if (startDate && !endDate && hoverDate) {
+            const [from, to] = orderRangeEdges(startDate, hoverDate)
+            previewRole = getRangeBoundaryRole(date, from, to)
+          }
+
+          const showAnchorOnly =
+            Boolean(startDate && !endDate && !hoverDate) &&
+            isSameCalendarDay(date, startDate)
+
+          return (
+            <DayCell
+              key={cell.key}
+              date={date}
+              onDateClick={onDateClick}
+              onDateEnter={onDateHover}
+              confirmedRole={confirmedRole}
+              previewRole={previewRole}
+              showAnchorOnly={showAnchorOnly}
+              isToday={isSameCalendarDay(date, today)}
+            />
+          )
         })}
       </div>
     </section>

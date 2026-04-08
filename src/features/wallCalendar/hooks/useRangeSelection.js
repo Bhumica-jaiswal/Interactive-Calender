@@ -1,23 +1,8 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { normalizeCalendarDate, orderRangeEdges } from '../utils/calendarDates.js'
 
-function startOfLocalDay(date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
-}
-
-function compareCalendarDays(a, b) {
-  return startOfLocalDay(a).getTime() - startOfLocalDay(b).getTime()
-}
-
-function orderRangeEdges(a, b) {
-  if (compareCalendarDays(b, a) < 0) {
-    return [b, a]
-  }
-  return [a, b]
-}
-
-function normalizeCalendarDate(date) {
-  return startOfLocalDay(date)
-}
+/** Debounced clear avoids preview flashing when the pointer briefly leaves the grid or crosses gaps. */
+const HOVER_CLEAR_DELAY_MS = 48
 
 /**
  * Range selection for calendar UIs: anchor → end → reset cycle; hover for preview.
@@ -29,11 +14,31 @@ export function useRangeSelection() {
   const [endDate, setEndDate] = useState(null)
   const [hoverDate, setHoverDate] = useState(null)
 
+  const hoverClearTimerRef = useRef(null)
+
+  const cancelPendingHoverClear = useCallback(() => {
+    if (hoverClearTimerRef.current == null) return
+    clearTimeout(hoverClearTimerRef.current)
+    hoverClearTimerRef.current = null
+  }, [])
+
+  const scheduleHoverClear = useCallback(() => {
+    cancelPendingHoverClear()
+    hoverClearTimerRef.current = setTimeout(() => {
+      setHoverDate(null)
+      hoverClearTimerRef.current = null
+    }, HOVER_CLEAR_DELAY_MS)
+  }, [cancelPendingHoverClear])
+
+  useEffect(() => () => cancelPendingHoverClear(), [cancelPendingHoverClear])
+
   const onDateClick = useCallback(
     (clickedDate) => {
       if (startDate != null && endDate != null) {
+        cancelPendingHoverClear()
         setStartDate(null)
         setEndDate(null)
+        setHoverDate(null)
         return
       }
 
@@ -44,15 +49,25 @@ export function useRangeSelection() {
       }
 
       const [from, to] = orderRangeEdges(startDate, clickedDate).map(normalizeCalendarDate)
+      cancelPendingHoverClear()
       setStartDate(from)
       setEndDate(to)
+      setHoverDate(null)
     },
-    [startDate, endDate],
+    [startDate, endDate, cancelPendingHoverClear],
   )
 
-  const onDateHover = useCallback((date) => {
-    setHoverDate(date == null ? null : normalizeCalendarDate(date))
-  }, [])
+  const onDateHover = useCallback(
+    (date) => {
+      if (date != null) {
+        cancelPendingHoverClear()
+        setHoverDate(normalizeCalendarDate(date))
+        return
+      }
+      scheduleHoverClear()
+    },
+    [cancelPendingHoverClear, scheduleHoverClear],
+  )
 
   return {
     startDate,
