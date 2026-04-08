@@ -29,7 +29,7 @@ export function HeroSection({ year, month, imageUrl = HERO_IMAGE_URL }) {
             {title}
           </h1>
           <p className="mt-1.5 text-xs leading-snug text-white/80 sm:text-sm">
-            Minimal • Range-ready • Notes
+            Minimal • Range-ready • Memories
           </p>
         </div>
       </div>

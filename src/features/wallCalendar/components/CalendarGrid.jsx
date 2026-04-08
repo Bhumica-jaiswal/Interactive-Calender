@@ -6,7 +6,6 @@ import {
   getRangeBoundaryRole,
   isSameCalendarDay,
   orderRangeEdges,
-  startOfLocalDay,
 } from '../utils/calendarDates.js'
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -31,7 +30,9 @@ export function CalendarGrid({
   hoverDate,
   onDateClick,
   onDateHover,
-  daysWithNotes,
+  getMemoryForDate,
+  activeMemory,
+  draftMemoryType,
 }) {
   const cells = useMemo(() => buildCalendarMonth(year, month), [year, month])
   const today = new Date()
@@ -83,11 +84,31 @@ export function CalendarGrid({
             }
 
             const showAnchorOnly =
+              !activeMemory &&
               Boolean(startDate && !endDate && !hoverDate) &&
               isSameCalendarDay(date, startDate)
 
-            const hasNote =
-              daysWithNotes != null && daysWithNotes.has(startOfLocalDay(date).getTime())
+            const memoriesForDay = getMemoryForDate ? getMemoryForDate(date) : []
+            const hasWorkMemory = memoriesForDay.some((m) => m.type === 'work')
+            const hasLifeMemory = memoriesForDay.some((m) => m.type === 'life')
+            const tooltipMemory = memoriesForDay.length > 0 ? memoriesForDay[0] : null
+
+            const resolvedConfirmedRole = activeMemory
+              ? getRangeBoundaryRole(
+                  date,
+                  activeMemory.startDate,
+                  activeMemory.endDate,
+                )
+              : confirmedRole
+
+            const resolvedPreviewRole =
+              !activeMemory && previewRole ? previewRole : null
+
+            const memoryHighlightType = resolvedConfirmedRole
+              ? activeMemory
+                ? activeMemory.type
+                : draftMemoryType
+              : null
 
             return (
               <DayCell
@@ -95,11 +116,14 @@ export function CalendarGrid({
                 date={date}
                 onDateClick={onDateClick}
                 onDateEnter={onDateHover}
-                confirmedRole={confirmedRole}
-                previewRole={previewRole}
+                confirmedRole={resolvedConfirmedRole}
+                previewRole={resolvedPreviewRole}
                 showAnchorOnly={showAnchorOnly}
                 isToday={isSameCalendarDay(date, today)}
-                hasNote={hasNote}
+                hasWorkMemory={hasWorkMemory}
+                hasLifeMemory={hasLifeMemory}
+                tooltipMemory={tooltipMemory}
+                memoryHighlightType={memoryHighlightType}
               />
             )
           })}

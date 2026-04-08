@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { cx } from '../utils/cx.js'
+import { formatRangeLabel } from '../utils/rangeNotes.js'
 
 const TRANSITION_CLASSES =
   'transition-[transform,background-color,color,box-shadow,border-color,ring-color] duration-200 ease-out motion-reduce:transform-none motion-reduce:transition-none'
@@ -26,7 +27,10 @@ function DayCellInner({
   previewRole,
   showAnchorOnly,
   isToday,
-  hasNote,
+  hasWorkMemory,
+  hasLifeMemory,
+  tooltipMemory,
+  memoryHighlightType,
 }) {
   const label = formatDayNumber(date)
   const { layer, role } = resolveVisualState({
@@ -57,17 +61,41 @@ function DayCellInner({
             ? 'rounded-lg'
             : 'rounded-2xl'
 
-  const layerClasses =
-    layer === 'confirmed'
+  const confirmedMemoryClasses =
+    memoryHighlightType === 'work'
       ? {
           single:
-            'border-transparent bg-[var(--wc-primary)] text-[var(--wc-on-primary)] shadow-md shadow-zinc-950/25 hover:scale-[1.02] hover:shadow-lg',
+            'border-transparent bg-blue-500 text-white shadow-md shadow-blue-500/20 hover:scale-[1.02]',
           start:
-            'border-transparent bg-[var(--wc-primary)] text-[var(--wc-on-primary)] shadow-md shadow-zinc-950/20 hover:scale-[1.02]',
-          end: 'border-transparent bg-[var(--wc-primary)] text-[var(--wc-on-primary)] shadow-md shadow-zinc-950/20 hover:scale-[1.02]',
-          middle:
-            'border-[var(--wc-primary-muted)] bg-[var(--wc-primary-soft)] text-zinc-900 shadow-sm hover:brightness-[0.98]',
+            'border-transparent bg-blue-500 text-white shadow-md shadow-blue-500/20 hover:scale-[1.02]',
+          end: 'border-transparent bg-blue-500 text-white shadow-md shadow-blue-500/20 hover:scale-[1.02]',
+          middle: 'border-blue-200 bg-blue-100 text-blue-900 shadow-sm hover:bg-blue-100/95',
         }
+      : memoryHighlightType === 'life'
+        ? {
+            single:
+              'border-transparent bg-green-500 text-white shadow-md shadow-green-500/20 hover:scale-[1.02]',
+            start:
+              'border-transparent bg-green-500 text-white shadow-md shadow-green-500/20 hover:scale-[1.02]',
+            end: 'border-transparent bg-green-500 text-white shadow-md shadow-green-500/20 hover:scale-[1.02]',
+            middle:
+              'border-green-200 bg-green-100 text-green-900 shadow-sm hover:bg-green-100/95',
+          }
+        : null
+
+  const confirmedDynamicClasses = {
+    single:
+      'border-transparent bg-[var(--wc-primary)] text-[var(--wc-on-primary)] shadow-md shadow-zinc-950/25 hover:scale-[1.02] hover:shadow-lg',
+    start:
+      'border-transparent bg-[var(--wc-primary)] text-[var(--wc-on-primary)] shadow-md shadow-zinc-950/20 hover:scale-[1.02]',
+    end: 'border-transparent bg-[var(--wc-primary)] text-[var(--wc-on-primary)] shadow-md shadow-zinc-950/20 hover:scale-[1.02]',
+    middle:
+      'border-[var(--wc-primary-muted)] bg-[var(--wc-primary-soft)] text-zinc-900 shadow-sm hover:brightness-[0.98]',
+  }
+
+  const layerClasses =
+    layer === 'confirmed'
+      ? confirmedMemoryClasses ?? confirmedDynamicClasses
       : layer === 'preview'
         ? {
             single:
@@ -92,13 +120,21 @@ function DayCellInner({
       : 'border-zinc-200 bg-white shadow-sm hover:border-zinc-300 hover:bg-zinc-50'
 
   const todayRing = isToday
-    ? isDarkEndpoint
-      ? 'ring-2 ring-inset ring-white/40'
-      : isPreviewEndpoint
-        ? 'ring-2 ring-inset ring-[var(--wc-primary-soft)]'
-        : isHighlighted
-          ? 'ring-2 ring-inset ring-[var(--wc-primary-ring)]'
-          : 'ring-2 ring-inset ring-zinc-400/45'
+    ? memoryHighlightType
+      ? isDarkEndpoint
+        ? memoryHighlightType === 'work'
+          ? 'ring-2 ring-inset ring-blue-200/60'
+          : 'ring-2 ring-inset ring-green-200/60'
+        : memoryHighlightType === 'work'
+          ? 'ring-2 ring-inset ring-blue-300/35'
+          : 'ring-2 ring-inset ring-green-300/35'
+      : isDarkEndpoint
+        ? 'ring-2 ring-inset ring-white/40'
+        : isPreviewEndpoint
+          ? 'ring-2 ring-inset ring-[var(--wc-primary-soft)]'
+          : isHighlighted
+            ? 'ring-2 ring-inset ring-[var(--wc-primary-ring)]'
+            : 'ring-2 ring-inset ring-zinc-400/45'
     : ''
 
   const baseInteractive = [
@@ -117,7 +153,7 @@ function DayCellInner({
     day: 'numeric',
     year: 'numeric',
   })
-  const ariaLabel = hasNote ? `${ariaLabelBase}. Has note.` : ariaLabelBase
+  const ariaLabel = ariaLabelBase
 
   return (
     <button
@@ -155,14 +191,42 @@ function DayCellInner({
         )}
       />
 
-      {hasNote ? (
-        <span
+      {(hasWorkMemory || hasLifeMemory) ? (
+        <div className="pointer-events-none absolute bottom-1 left-1/2 flex -translate-x-1/2 items-center gap-1.5 sm:bottom-1.5">
+          {hasWorkMemory ? (
+            <span
+              className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-sm"
+              aria-hidden
+            />
+          ) : null}
+          {hasLifeMemory ? (
+            <span
+              className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-sm"
+              aria-hidden
+            />
+          ) : null}
+        </div>
+      ) : null}
+
+      {tooltipMemory ? (
+        <div
           className={cx(
-            'pointer-events-none absolute bottom-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-amber-500 shadow-sm transition-opacity duration-200 sm:bottom-1.5',
-            labelLight ? 'ring-2 ring-white/70' : 'ring-2 ring-white',
+            'pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-[11rem] -translate-x-1/2 rounded-xl bg-zinc-950/95 px-2.5 py-2 text-left text-[11px] text-white shadow-lg shadow-black/20',
+            'opacity-0 translate-y-1 transition-all duration-200 ease-out',
+            'group-hover:opacity-100 group-hover:translate-y-0 motion-reduce:transition-none motion-reduce:transform-none',
           )}
           aria-hidden
-        />
+        >
+          <div className="truncate font-medium text-white">{tooltipMemory.title}</div>
+          <div className="mt-1 text-[10px] leading-snug text-zinc-200">
+            {formatRangeLabel(tooltipMemory.startDate, tooltipMemory.endDate)}
+          </div>
+          {tooltipMemory.details ? (
+            <div className="mt-1 line-clamp-2 text-[10px] leading-snug text-zinc-300">
+              {tooltipMemory.details}
+            </div>
+          ) : null}
+        </div>
       ) : null}
     </button>
   )
@@ -175,7 +239,10 @@ function propsAreEqual(prev, next) {
     prev.previewRole === next.previewRole &&
     prev.showAnchorOnly === next.showAnchorOnly &&
     prev.isToday === next.isToday &&
-    prev.hasNote === next.hasNote &&
+    prev.hasWorkMemory === next.hasWorkMemory &&
+    prev.hasLifeMemory === next.hasLifeMemory &&
+    prev.memoryHighlightType === next.memoryHighlightType &&
+    (prev.tooltipMemory?.id ?? null) === (next.tooltipMemory?.id ?? null) &&
     prev.onDateClick === next.onDateClick &&
     prev.onDateEnter === next.onDateEnter
   )

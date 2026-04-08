@@ -1,97 +1,81 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  formatRangeLabel,
-  makeRangeKey,
-  parseNoteFields,
-  parseRangeKey,
-  previewNoteText,
-  serializeNoteFields,
-} from '../utils/rangeNotes.js'
+import { formatRangeLabel } from '../utils/rangeNotes.js'
 
-function SavedNoteRow({ noteKey, text, onEdit }) {
-  const parsed = parseRangeKey(noteKey)
-  const label =
-    parsed != null ? formatRangeLabel(parsed.start, parsed.end) : noteKey
-  const preview = previewNoteText(text)
+const MEMORY_TYPES = [
+  { type: 'work', label: 'Work', accent: 'blue' },
+  { type: 'life', label: 'Life', accent: 'green' },
+]
+
+function accentClasses(accent, selected) {
+  if (selected) {
+    return (
+      accent === 'blue'
+        ? 'border-blue-500 bg-blue-500 text-white shadow-sm'
+        : 'border-green-500 bg-green-500 text-white shadow-sm'
+    )
+  }
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm transition duration-200 hover:-translate-y-[1px] hover:border-zinc-300 hover:shadow-md sm:p-4">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</p>
-          <p className="mt-1 line-clamp-2 text-sm text-zinc-800">{preview || '—'}</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => parsed && onEdit(parsed.start, parsed.end)}
-          className="touch-manipulation shrink-0 rounded-lg px-3 py-2.5 text-xs font-medium text-zinc-700 transition duration-200 hover:bg-zinc-100 hover:text-zinc-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white md:min-h-0 md:px-2 md:py-1.5"
-        >
-          Edit
-        </button>
-      </div>
-    </div>
+    accent === 'blue'
+      ? 'border-blue-100 bg-blue-50 text-blue-800 hover:bg-blue-100'
+      : 'border-green-100 bg-green-50 text-green-800 hover:bg-green-100'
   )
 }
 
 export function NotesPanel({
   startDate,
   endDate,
-  notesByRangeKey,
-  onSaveNote,
-  onRemoveNote,
-  onSelectRange,
+  onAddMemory,
+  memoryType,
+  onTypeChange,
 }) {
-  const [summary, setSummary] = useState('')
+  const [title, setTitle] = useState('')
   const [details, setDetails] = useState('')
 
   const hasFullRange = Boolean(startDate && endDate)
-  const rangeKey = hasFullRange ? makeRangeKey(startDate, endDate) : null
-  const existingRaw = rangeKey != null ? notesByRangeKey[rangeKey] ?? '' : ''
+  const rangeLabel = useMemo(
+    () => (hasFullRange ? formatRangeLabel(startDate, endDate) : ''),
+    [hasFullRange, startDate, endDate],
+  )
 
   useEffect(() => {
-    if (!hasFullRange || rangeKey == null) {
-      setSummary('')
+    if (!hasFullRange) {
+      setTitle('')
       setDetails('')
-      return
+      onTypeChange?.('work')
     }
-    const { summary: s, details: d } = parseNoteFields(notesByRangeKey[rangeKey] ?? '')
-    setSummary(s)
-    setDetails(d)
-  }, [hasFullRange, rangeKey, notesByRangeKey])
-
-  const savedEntries = useMemo(() => {
-    return Object.entries(notesByRangeKey)
-      .filter(([, v]) => String(v).trim() !== '')
-      .sort(([a], [b]) => a.localeCompare(b))
-  }, [notesByRangeKey])
-
-  const draftValue = serializeNoteFields(summary, details)
-  const dirty = hasFullRange && draftValue.trim() !== String(existingRaw).trim()
+  }, [hasFullRange])
 
   const handleSave = () => {
-    if (!rangeKey) return
-    onSaveNote?.(rangeKey, draftValue)
-  }
+    if (!hasFullRange) return
+    const trimmed = title.trim()
+    if (!trimmed) return
 
-  const handleRemove = () => {
-    if (!rangeKey) return
-    onRemoveNote?.(rangeKey)
-    setSummary('')
+    onAddMemory?.({
+      title: trimmed,
+      type: memoryType,
+      startDate,
+      endDate,
+      details: details.trim(),
+    })
+
+    setTitle('')
     setDetails('')
+    onTypeChange?.('work')
   }
 
-  const saveDisabled =
-    !hasFullRange ||
-    !dirty ||
-    (String(existingRaw).trim() === '' && draftValue.trim() === '')
+  const saveDisabled = !hasFullRange || !title.trim()
+  const primaryAccent = memoryType === 'work' ? 'blue' : 'green'
 
   return (
     <section className="md:sticky md:top-6 md:z-10 md:self-start">
       <div className="rounded-3xl bg-zinc-50 p-4 ring-1 ring-zinc-950/5 sm:p-5 md:max-h-[min(100%,calc(100dvh-5rem))] md:overflow-y-auto md:overscroll-contain md:p-6 md:pr-4">
         <div>
-          <h3 className="text-base font-semibold tracking-tight text-zinc-900">Notes</h3>
+          <h3 className="text-base font-semibold tracking-tight text-zinc-900">
+            Memories
+          </h3>
           <p className="mt-1 text-sm leading-relaxed text-zinc-500">
-            Select a date range, then add a short label and optional details.
+            Create a memory from a selected date range.
           </p>
         </div>
 
@@ -99,93 +83,93 @@ export function NotesPanel({
           {!hasFullRange ? (
             <p className="text-sm text-zinc-600">
               Choose a <span className="font-medium text-zinc-800">start</span> and{' '}
-              <span className="font-medium text-zinc-800">end</span> date on the calendar to
-              attach a note.
+              <span className="font-medium text-zinc-800">end</span> date on the calendar
+              to save a memory.
             </p>
           ) : (
             <>
               <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
                 Selected range
               </p>
-              <p className="mt-1 text-sm font-semibold text-zinc-900">
-                {formatRangeLabel(startDate, endDate)}
-              </p>
+              <p className="mt-1 text-sm font-semibold text-zinc-900">{rangeLabel}</p>
 
               <div className="mt-4 space-y-3">
                 <div>
                   <label
                     className="mb-1 block text-xs font-medium text-zinc-600"
-                    htmlFor="note-summary"
+                    htmlFor="memory-title"
                   >
-                    Summary
+                    Title
                   </label>
                   <input
-                    id="note-summary"
+                    id="memory-title"
                     type="text"
-                    value={summary}
-                    onChange={(e) => setSummary(e.target.value)}
-                    placeholder="e.g. Trip planning"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="e.g. Team offsite"
                     className="w-full min-h-[44px] rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-base text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-300 focus:ring-2 focus:ring-zinc-900/10 sm:min-h-0 sm:py-2 sm:text-sm"
                     autoComplete="off"
                   />
                 </div>
+
+                <div>
+                  <p className="mb-1 text-xs font-medium text-zinc-600">Type</p>
+                  <div className="inline-flex w-full rounded-2xl bg-zinc-100 p-0.5">
+                    {MEMORY_TYPES.map((t) => {
+                      const selected = memoryType === t.type
+                      return (
+                        <button
+                          key={t.type}
+                          type="button"
+                          onClick={() => onTypeChange?.(t.type)}
+                          className={[
+                            'relative inline-flex min-h-[36px] flex-1 items-center justify-center rounded-2xl px-3 text-xs font-medium transition',
+                            'focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20',
+                            'touch-manipulation',
+                            accentClasses(t.accent, selected),
+                          ].join(' ')}
+                        >
+                          {t.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
                 <div>
                   <label
                     className="mb-1 block text-xs font-medium text-zinc-600"
-                    htmlFor="note-details"
+                    htmlFor="memory-details"
                   >
-                    Details <span className="font-normal text-zinc-400">(optional)</span>
+                    Details (optional)
                   </label>
                   <textarea
-                    id="note-details"
+                    id="memory-details"
                     value={details}
                     onChange={(e) => setDetails(e.target.value)}
-                    placeholder="Flights, links, reminders…"
-                    rows={3}
-                    className="w-full resize-y rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-base leading-relaxed text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-300 focus:ring-2 focus:ring-zinc-900/10 sm:py-2 sm:text-sm"
+                    placeholder="Add one or two lines (links, context, reminders...)"
+                    rows={2}
+                    className="w-full resize-y rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-300 focus:ring-2 focus:ring-zinc-900/10 sm:py-2"
                   />
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+              <div className="mt-4">
                 <button
                   type="button"
                   onClick={handleSave}
                   disabled={saveDisabled}
-                  className="touch-manipulation inline-flex min-h-[44px] flex-1 items-center justify-center rounded-xl bg-[var(--wc-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--wc-on-primary)] shadow-sm transition hover:brightness-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--wc-primary-ring)] disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0 sm:flex-none sm:px-3 sm:py-2"
+                  className={[
+                    'touch-manipulation inline-flex min-h-[44px] w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20 disabled:cursor-not-allowed disabled:opacity-50',
+                    primaryAccent === 'blue'
+                      ? 'bg-blue-500 text-white hover:brightness-95'
+                      : 'bg-green-500 text-white hover:brightness-95',
+                  ].join(' ')}
                 >
-                  Save note
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRemove}
-                  disabled={!hasFullRange || String(existingRaw).trim() === ''}
-                  className="touch-manipulation inline-flex min-h-[44px] flex-1 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20 disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0 sm:flex-none sm:px-3 sm:py-2"
-                >
-                  Remove
+                  Save Memory
                 </button>
               </div>
-              {String(existingRaw).trim() !== '' && !dirty ? (
-                <p className="mt-3 text-xs text-zinc-500">Saved for this range. Edit fields to update.</p>
-              ) : null}
             </>
-          )}
-        </div>
-
-        <div className="mt-5">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-            All notes ({savedEntries.length})
-          </p>
-          {savedEntries.length === 0 ? (
-            <p className="mt-2 text-sm text-zinc-500">No notes yet.</p>
-          ) : (
-            <ul className="mt-3 flex flex-col gap-2.5 pb-1">
-              {savedEntries.map(([key, text]) => (
-                <li key={key}>
-                  <SavedNoteRow noteKey={key} text={text} onEdit={onSelectRange} />
-                </li>
-              ))}
-            </ul>
           )}
         </div>
       </div>

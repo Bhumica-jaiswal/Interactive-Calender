@@ -49,7 +49,7 @@ export function CalendarHeader({ year, month, onPrevMonth, onNextMonth }) {
           {monthName} <span className="text-zinc-500">{year}</span>
         </h2>
         <p className="mt-1 text-sm leading-relaxed text-zinc-500 sm:max-w-md">
-          Select a range to preview, confirm, and attach notes.
+          Select a range to preview, confirm, and attach memories.
         </p>
         <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-[var(--wc-primary-muted)] bg-[var(--wc-primary-soft)] px-3 py-1 text-xs font-medium text-zinc-800 shadow-sm">
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--wc-primary)]" aria-hidden />
