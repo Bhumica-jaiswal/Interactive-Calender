@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Small baseline to match the “paper calendar” aesthetic */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-zinc-100 text-zinc-900 antialiased;
+}
+
