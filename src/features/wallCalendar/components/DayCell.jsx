@@ -3,6 +3,9 @@ import { memo } from 'react'
 const TRANSITION_CLASSES =
   'transition-[transform,background-color,color,box-shadow,border-color,ring-color] duration-200 ease-out motion-reduce:transform-none motion-reduce:transition-none'
 
+const HOVER_LIFT_CLASSES =
+  'hover:scale-[1.02] hover:-translate-y-[1px] hover:shadow-md active:translate-y-0'
+
 function formatDayNumber(date) {
   return String(date.getDate())
 }
@@ -85,7 +88,7 @@ function DayCellInner({
   const layerStyleClasses =
     layerClasses && roleKey
       ? layerClasses[roleKey]
-      : 'border-zinc-200 bg-white shadow-sm hover:scale-[1.02] hover:border-zinc-300 hover:bg-zinc-50'
+      : 'border-zinc-200 bg-white shadow-sm hover:border-zinc-300 hover:bg-zinc-50'
 
   const todayRing = isToday
     ? isDarkEndpoint
@@ -98,9 +101,11 @@ function DayCellInner({
     : ''
 
   const baseInteractive = [
-    'group relative flex aspect-square w-full flex-col items-start justify-between p-2 text-left',
+    'group relative flex aspect-square w-full min-h-0 min-w-0 flex-col items-start justify-between p-1.5 text-left sm:p-2',
+    'touch-manipulation select-none',
     TRANSITION_CLASSES,
-    'focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20 active:scale-[0.98]',
+    HOVER_LIFT_CLASSES,
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.98]',
   ].join(' ')
 
   const borderBase = layer === 'none' ? 'border' : ''
@@ -127,7 +132,7 @@ function DayCellInner({
       <div className="flex w-full items-center justify-between">
         <span
           className={[
-            'text-sm font-semibold',
+            'text-[13px] font-semibold leading-none sm:text-sm',
             TRANSITION_CLASSES,
             labelLight ? 'text-white' : 'text-zinc-900/90 group-hover:text-zinc-900',
           ].join(' ')}
@@ -145,7 +150,7 @@ function DayCellInner({
 
       <div
         className={[
-          'mt-2 h-7 w-full rounded-xl',
+          'mt-1 h-5 w-full rounded-lg sm:mt-2 sm:h-7 sm:rounded-xl',
           TRANSITION_CLASSES,
           isHighlighted ? 'opacity-0' : 'bg-zinc-100/70 opacity-0 group-hover:opacity-100',
         ].join(' ')}
@@ -154,7 +159,7 @@ function DayCellInner({
       {hasNote ? (
         <span
           className={[
-            'pointer-events-none absolute bottom-1.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-amber-500 shadow-sm transition-opacity duration-200',
+            'pointer-events-none absolute bottom-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-amber-500 shadow-sm transition-opacity duration-200 sm:bottom-1.5',
             labelLight ? 'ring-2 ring-white/70' : 'ring-2 ring-white',
           ].join(' ')}
           aria-hidden

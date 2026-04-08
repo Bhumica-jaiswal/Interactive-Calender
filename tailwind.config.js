@@ -4,13 +4,15 @@ export default {
   theme: {
     extend: {
       keyframes: {
-        'cal-enter-left': {
-          from: { opacity: '0', transform: 'translateX(-0.65rem)' },
-          to: { opacity: '1', transform: 'translateX(0)' },
+        'cal-flip-next': {
+          '0%': { opacity: '0.28', transform: 'rotateX(-22deg) translateY(-10px)' },
+          '55%': { opacity: '0.9' },
+          '100%': { opacity: '1', transform: 'rotateX(0deg) translateY(0)' },
         },
-        'cal-enter-right': {
-          from: { opacity: '0', transform: 'translateX(0.65rem)' },
-          to: { opacity: '1', transform: 'translateX(0)' },
+        'cal-flip-prev': {
+          '0%': { opacity: '0.28', transform: 'rotateX(22deg) translateY(10px)' },
+          '55%': { opacity: '0.9' },
+          '100%': { opacity: '1', transform: 'rotateX(0deg) translateY(0)' },
         },
         'cal-enter-fade': {
           from: { opacity: '0' },
@@ -18,10 +20,10 @@ export default {
         },
       },
       animation: {
-        'cal-enter-left':
-          'cal-enter-left 280ms cubic-bezier(0.22, 1, 0.36, 1) both',
-        'cal-enter-right':
-          'cal-enter-right 280ms cubic-bezier(0.22, 1, 0.36, 1) both',
+        'cal-flip-next':
+          'cal-flip-next 340ms cubic-bezier(0.22, 1, 0.36, 1) both',
+        'cal-flip-prev':
+          'cal-flip-prev 340ms cubic-bezier(0.22, 1, 0.36, 1) both',
         'cal-enter-fade':
           'cal-enter-fade 220ms cubic-bezier(0.22, 1, 0.36, 1) both',
       },

@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 /* Small baseline to match the “paper calendar” aesthetic */
+html {
+  overflow-x: hidden;
+}
+
 html,
 body {
   height: 100%;

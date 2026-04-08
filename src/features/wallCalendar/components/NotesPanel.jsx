@@ -15,7 +15,7 @@ function SavedNoteRow({ noteKey, text, onEdit }) {
   const preview = previewNoteText(text)
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm transition duration-200 hover:-translate-y-[1px] hover:border-zinc-300 hover:shadow-md sm:p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</p>
@@ -24,7 +24,7 @@ function SavedNoteRow({ noteKey, text, onEdit }) {
         <button
           type="button"
           onClick={() => parsed && onEdit(parsed.start, parsed.end)}
-          className="shrink-0 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20"
+          className="touch-manipulation shrink-0 rounded-lg px-3 py-2.5 text-xs font-medium text-zinc-700 transition duration-200 hover:bg-zinc-100 hover:text-zinc-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white md:min-h-0 md:px-2 md:py-1.5"
         >
           Edit
         </button>
@@ -86,16 +86,16 @@ export function NotesPanel({
     (String(existingRaw).trim() === '' && draftValue.trim() === '')
 
   return (
-    <section className="sticky top-6">
-      <div className="rounded-3xl bg-zinc-50 p-5 ring-1 ring-zinc-950/5 sm:p-6">
+    <section className="md:sticky md:top-6 md:z-10 md:self-start">
+      <div className="rounded-3xl bg-zinc-50 p-4 ring-1 ring-zinc-950/5 sm:p-5 md:max-h-[min(100%,calc(100dvh-5rem))] md:overflow-y-auto md:overscroll-contain md:p-6 md:pr-4">
         <div>
           <h3 className="text-base font-semibold tracking-tight text-zinc-900">Notes</h3>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm leading-relaxed text-zinc-500">
             Select a date range, then add a short label and optional details.
           </p>
         </div>
 
-        <div className="mt-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+        <div className="mt-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm sm:p-5">
           {!hasFullRange ? (
             <p className="text-sm text-zinc-600">
               Choose a <span className="font-medium text-zinc-800">start</span> and{' '}
@@ -125,7 +125,7 @@ export function NotesPanel({
                     value={summary}
                     onChange={(e) => setSummary(e.target.value)}
                     placeholder="e.g. Trip planning"
-                    className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-300 focus:ring-2 focus:ring-zinc-900/10"
+                    className="w-full min-h-[44px] rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-base text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-300 focus:ring-2 focus:ring-zinc-900/10 sm:min-h-0 sm:py-2 sm:text-sm"
                     autoComplete="off"
                   />
                 </div>
@@ -142,17 +142,17 @@ export function NotesPanel({
                     onChange={(e) => setDetails(e.target.value)}
                     placeholder="Flights, links, reminders…"
                     rows={3}
-                    className="w-full resize-y rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-300 focus:ring-2 focus:ring-zinc-900/10"
+                    className="w-full resize-y rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-base leading-relaxed text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-300 focus:ring-2 focus:ring-zinc-900/10 sm:py-2 sm:text-sm"
                   />
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center gap-2">
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                 <button
                   type="button"
                   onClick={handleSave}
                   disabled={saveDisabled}
-                  className="inline-flex items-center justify-center rounded-xl bg-zinc-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/25 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="touch-manipulation inline-flex min-h-[44px] flex-1 items-center justify-center rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/25 disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0 sm:flex-none sm:px-3 sm:py-2"
                 >
                   Save note
                 </button>
@@ -160,7 +160,7 @@ export function NotesPanel({
                   type="button"
                   onClick={handleRemove}
                   disabled={!hasFullRange || String(existingRaw).trim() === ''}
-                  className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="touch-manipulation inline-flex min-h-[44px] flex-1 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20 disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0 sm:flex-none sm:px-3 sm:py-2"
                 >
                   Remove
                 </button>
@@ -179,7 +179,7 @@ export function NotesPanel({
           {savedEntries.length === 0 ? (
             <p className="mt-2 text-sm text-zinc-500">No notes yet.</p>
           ) : (
-            <ul className="mt-3 flex flex-col gap-2">
+            <ul className="mt-3 flex flex-col gap-2.5 pb-1">
               {savedEntries.map(([key, text]) => (
                 <li key={key}>
                   <SavedNoteRow noteKey={key} text={text} onEdit={onSelectRange} />

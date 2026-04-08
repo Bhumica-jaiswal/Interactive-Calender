@@ -8,7 +8,7 @@ export function HeroSection({ year, month }) {
 
   return (
     <header className="relative">
-      <div className="relative h-40 w-full sm:h-52 lg:h-60">
+      <div className="relative h-36 w-full min-h-0 sm:h-44 md:h-52 lg:h-60">
         <img
           className="h-full w-full object-cover"
           src={HERO_IMAGE_URL}
@@ -18,17 +18,19 @@ export function HeroSection({ year, month }) {
 
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950/50 via-zinc-950/10 to-transparent" />
 
-        <div className="absolute left-5 top-5 sm:left-7 sm:top-7 lg:left-10 lg:top-9">
-          <p className="text-xs font-medium uppercase tracking-[0.24em] text-white/85">
+        <div className="absolute left-4 right-4 top-4 max-w-[min(100%,28rem)] sm:left-6 sm:right-auto sm:top-6 md:left-8 md:top-8 lg:left-10 lg:top-9">
+          <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-white/85 sm:text-xs">
             Wall Calendar
           </p>
           <h1
-            className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl"
+            className="mt-1 text-xl font-semibold leading-tight tracking-tight text-white sm:text-2xl md:text-3xl"
             aria-live="polite"
           >
             {title}
           </h1>
-          <p className="mt-1 text-sm text-white/80">Minimal • Range-ready • Notes</p>
+          <p className="mt-1.5 text-xs leading-snug text-white/80 sm:text-sm">
+            Minimal • Range-ready • Notes
+          </p>
         </div>
       </div>
 
