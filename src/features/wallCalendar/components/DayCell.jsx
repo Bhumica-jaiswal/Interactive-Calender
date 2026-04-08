@@ -60,27 +60,27 @@ function DayCellInner({
     layer === 'confirmed'
       ? {
           single:
-            'border-transparent bg-zinc-900 text-white shadow-md shadow-zinc-950/25 hover:scale-[1.02] hover:shadow-lg',
+            'border-transparent bg-[var(--wc-primary)] text-[var(--wc-on-primary)] shadow-md shadow-zinc-950/25 hover:scale-[1.02] hover:shadow-lg',
           start:
-            'border-transparent bg-zinc-900 text-white shadow-md shadow-zinc-950/20 hover:scale-[1.02]',
-          end: 'border-transparent bg-zinc-900 text-white shadow-md shadow-zinc-950/20 hover:scale-[1.02]',
+            'border-transparent bg-[var(--wc-primary)] text-[var(--wc-on-primary)] shadow-md shadow-zinc-950/20 hover:scale-[1.02]',
+          end: 'border-transparent bg-[var(--wc-primary)] text-[var(--wc-on-primary)] shadow-md shadow-zinc-950/20 hover:scale-[1.02]',
           middle:
-            'border-zinc-200/90 bg-zinc-200 text-zinc-900 shadow-sm hover:bg-zinc-200/95',
+            'border-[var(--wc-primary-muted)] bg-[var(--wc-primary-soft)] text-zinc-900 shadow-sm hover:brightness-[0.98]',
         }
       : layer === 'preview'
         ? {
             single:
-              'border border-dashed border-sky-400/70 bg-sky-500 text-white shadow-sm shadow-sky-500/20 ring-1 ring-sky-300/50 hover:scale-[1.02]',
+              'border border-dashed border-[var(--wc-primary-muted)] bg-[var(--wc-primary-muted)] text-zinc-900 shadow-sm ring-1 ring-[var(--wc-primary-ring)] hover:scale-[1.02]',
             start:
-              'border border-dashed border-sky-400/65 bg-sky-500 text-white shadow-sm shadow-sky-500/15 ring-1 ring-sky-300/45 hover:scale-[1.02]',
-            end: 'border border-dashed border-sky-400/65 bg-sky-500 text-white shadow-sm shadow-sky-500/15 ring-1 ring-sky-300/45 hover:scale-[1.02]',
+              'border border-dashed border-[var(--wc-primary-muted)] bg-[var(--wc-primary-muted)] text-zinc-900 shadow-sm ring-1 ring-[var(--wc-primary-ring)] hover:scale-[1.02]',
+            end: 'border border-dashed border-[var(--wc-primary-muted)] bg-[var(--wc-primary-muted)] text-zinc-900 shadow-sm ring-1 ring-[var(--wc-primary-ring)] hover:scale-[1.02]',
             middle:
-              'border border-sky-200/90 bg-sky-100 text-sky-950 shadow-sm ring-1 ring-sky-200/55 hover:bg-sky-100/95',
+              'border border-[var(--wc-primary-soft)] bg-[var(--wc-primary-soft)] text-zinc-900 shadow-sm ring-1 ring-[var(--wc-primary-ring)] hover:brightness-[0.98]',
           }
         : layer === 'anchor'
           ? {
               single:
-                'border-transparent bg-zinc-900 text-white shadow-md shadow-zinc-950/25 hover:scale-[1.02]',
+                'border-transparent bg-[var(--wc-primary)] text-[var(--wc-on-primary)] shadow-md shadow-zinc-950/25 hover:scale-[1.02]',
             }
           : null
 
@@ -94,9 +94,9 @@ function DayCellInner({
     ? isDarkEndpoint
       ? 'ring-2 ring-inset ring-white/40'
       : isPreviewEndpoint
-        ? 'ring-2 ring-inset ring-sky-100/70'
+        ? 'ring-2 ring-inset ring-[var(--wc-primary-soft)]'
         : isHighlighted
-          ? 'ring-2 ring-inset ring-sky-300/35'
+          ? 'ring-2 ring-inset ring-[var(--wc-primary-ring)]'
           : 'ring-2 ring-inset ring-zinc-400/45'
     : ''
 

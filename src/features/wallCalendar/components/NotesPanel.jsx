@@ -152,7 +152,7 @@ export function NotesPanel({
                   type="button"
                   onClick={handleSave}
                   disabled={saveDisabled}
-                  className="touch-manipulation inline-flex min-h-[44px] flex-1 items-center justify-center rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/25 disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0 sm:flex-none sm:px-3 sm:py-2"
+                  className="touch-manipulation inline-flex min-h-[44px] flex-1 items-center justify-center rounded-xl bg-[var(--wc-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--wc-on-primary)] shadow-sm transition hover:brightness-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--wc-primary-ring)] disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0 sm:flex-none sm:px-3 sm:py-2"
                 >
                   Save note
                 </button>

@@ -1,9 +1,10 @@
 import { startTransition, useCallback, useMemo, useState } from 'react'
-import { HeroSection } from './HeroSection.jsx'
+import { HeroSection, HERO_IMAGE_URL } from './HeroSection.jsx'
 import { CalendarHeader } from './CalendarHeader.jsx'
 import { CalendarGrid } from './CalendarGrid.jsx'
 import { NotesPanel } from './NotesPanel.jsx'
 import { useRangeSelection } from '../hooks/useRangeSelection.js'
+import { useImageTheme } from '../hooks/useImageTheme.js'
 import { addCalendarMonths } from '../utils/calendarView.js'
 import { buildDaysWithNotesSet } from '../utils/rangeNotes.js'
 
@@ -11,8 +12,15 @@ const DEFAULT_YEAR = 2026
 const DEFAULT_MONTH = 4
 
 export function CalendarContainer() {
-  const { startDate, endDate, hoverDate, onDateClick, onDateHover, setRange } =
-    useRangeSelection()
+  const {
+    startDate,
+    endDate,
+    hoverDate,
+    onDateClick,
+    onDateHover,
+    setRange,
+    clearSelection,
+  } = useRangeSelection()
   const [notesByRangeKey, setNotesByRangeKey] = useState({})
   const [visibleMonth, setVisibleMonth] = useState(() => ({
     year: DEFAULT_YEAR,
@@ -20,6 +28,7 @@ export function CalendarContainer() {
   }))
   /** -1 = previous, 1 = next, 0 = initial paint (no enter motion). */
   const [monthEnterDirection, setMonthEnterDirection] = useState(0)
+  const themeVars = useImageTheme(HERO_IMAGE_URL)
 
   const daysWithNotes = useMemo(() => buildDaysWithNotesSet(notesByRangeKey), [notesByRangeKey])
 
@@ -37,14 +46,20 @@ export function CalendarContainer() {
     })
   }, [])
 
-  const handleSaveNote = useCallback((key, value) => {
-    setNotesByRangeKey((prev) => {
-      const next = { ...prev }
-      if (String(value).trim() === '') delete next[key]
-      else next[key] = value
-      return next
-    })
-  }, [])
+  const handleSaveNote = useCallback(
+    (key, value) => {
+      setNotesByRangeKey((prev) => {
+        const next = { ...prev }
+        if (String(value).trim() === '') delete next[key]
+        else next[key] = value
+        return next
+      })
+
+      // Return calendar to neutral state after saving.
+      clearSelection()
+    },
+    [clearSelection],
+  )
 
   const handleRemoveNote = useCallback((key) => {
     setNotesByRangeKey((prev) => {
@@ -57,9 +72,16 @@ export function CalendarContainer() {
   return (
     <section className="mx-auto w-full min-w-0 max-w-6xl">
       <div className="overflow-hidden rounded-2xl bg-white shadow-[0_24px_60px_-36px_rgba(0,0,0,0.35)] ring-1 ring-zinc-950/5 md:rounded-3xl">
-        <HeroSection year={visibleMonth.year} month={visibleMonth.month} />
+        <HeroSection
+          year={visibleMonth.year}
+          month={visibleMonth.month}
+          imageUrl={HERO_IMAGE_URL}
+        />
 
-        <div className="grid min-w-0 grid-cols-1 gap-6 p-4 sm:p-5 md:grid-cols-[minmax(0,20rem)_1fr] md:gap-8 md:p-8 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-10 lg:p-10">
+        <div
+          style={themeVars}
+          className="grid min-w-0 grid-cols-1 gap-6 p-4 sm:p-5 md:grid-cols-[minmax(0,20rem)_1fr] md:gap-8 md:p-8 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-10 lg:p-10"
+        >
           <aside className="order-2 min-w-0 md:order-1">
             <NotesPanel
               startDate={startDate}

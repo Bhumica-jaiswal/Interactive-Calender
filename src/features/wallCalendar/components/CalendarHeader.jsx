@@ -45,8 +45,8 @@ export function CalendarHeader({ year, month, onPrevMonth, onNextMonth }) {
         <p className="mt-1 text-sm leading-relaxed text-zinc-500 sm:max-w-md">
           Select a range to preview, confirm, and attach notes.
         </p>
-        <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800 shadow-sm">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+        <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-[var(--wc-primary-muted)] bg-[var(--wc-primary-soft)] px-3 py-1 text-xs font-medium text-zinc-800 shadow-sm">
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--wc-primary)]" aria-hidden />
           <span>Today: {todayLabel}</span>
         </div>
       </div>
@@ -55,7 +55,7 @@ export function CalendarHeader({ year, month, onPrevMonth, onNextMonth }) {
         <button
           type="button"
           onClick={onPrevMonth}
-          className="inline-flex h-11 min-h-[44px] w-11 min-w-[44px] touch-manipulation items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-700 shadow-sm transition duration-200 hover:-translate-y-[1px] hover:bg-zinc-50 hover:text-zinc-900 hover:shadow-md active:translate-y-0 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:h-10 lg:min-h-0 lg:w-10 lg:min-w-0"
+          className="inline-flex h-11 min-h-[44px] w-11 min-w-[44px] touch-manipulation items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-700 shadow-sm transition duration-200 hover:-translate-y-[1px] hover:border-[var(--wc-primary-muted)] hover:bg-[var(--wc-primary-soft)] hover:text-zinc-900 hover:shadow-md active:translate-y-0 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--wc-primary-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:h-10 lg:min-h-0 lg:w-10 lg:min-w-0"
           aria-label={`Previous month, currently viewing ${heading}`}
         >
           <IconChevronLeft className="h-5 w-5" />
@@ -63,7 +63,7 @@ export function CalendarHeader({ year, month, onPrevMonth, onNextMonth }) {
         <button
           type="button"
           onClick={onNextMonth}
-          className="inline-flex h-11 min-h-[44px] w-11 min-w-[44px] touch-manipulation items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-700 shadow-sm transition duration-200 hover:-translate-y-[1px] hover:bg-zinc-50 hover:text-zinc-900 hover:shadow-md active:translate-y-0 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:h-10 lg:min-h-0 lg:w-10 lg:min-w-0"
+          className="inline-flex h-11 min-h-[44px] w-11 min-w-[44px] touch-manipulation items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-700 shadow-sm transition duration-200 hover:-translate-y-[1px] hover:border-[var(--wc-primary-muted)] hover:bg-[var(--wc-primary-soft)] hover:text-zinc-900 hover:shadow-md active:translate-y-0 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--wc-primary-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:h-10 lg:min-h-0 lg:w-10 lg:min-w-0"
           aria-label={`Next month, currently viewing ${heading}`}
         >
           <IconChevronRight className="h-5 w-5" />

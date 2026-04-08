@@ -1,9 +1,9 @@
 import { formatMonthYearHeading } from '../utils/calendarView.js'
 
-const HERO_IMAGE_URL =
+export const HERO_IMAGE_URL =
   'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2400&q=80'
 
-export function HeroSection({ year, month }) {
+export function HeroSection({ year, month, imageUrl = HERO_IMAGE_URL }) {
   const title = formatMonthYearHeading(year, month)
 
   return (
@@ -11,7 +11,7 @@ export function HeroSection({ year, month }) {
       <div className="relative h-36 w-full min-h-0 sm:h-44 md:h-52 lg:h-60">
         <img
           className="h-full w-full object-cover"
-          src={HERO_IMAGE_URL}
+          src={imageUrl}
           alt="Calendar hero"
           loading="lazy"
         />

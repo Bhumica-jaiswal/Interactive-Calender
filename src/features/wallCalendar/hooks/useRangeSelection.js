@@ -80,6 +80,13 @@ export function useRangeSelection() {
     [cancelPendingHoverClear],
   )
 
+  const clearSelection = useCallback(() => {
+    cancelPendingHoverClear()
+    setStartDate(null)
+    setEndDate(null)
+    setHoverDate(null)
+  }, [cancelPendingHoverClear])
+
   return {
     startDate,
     endDate,
@@ -87,5 +94,6 @@ export function useRangeSelection() {
     onDateClick,
     onDateHover,
     setRange,
+    clearSelection,
   }
 }
