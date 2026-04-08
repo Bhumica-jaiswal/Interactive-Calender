@@ -69,11 +69,23 @@ export function useRangeSelection() {
     [cancelPendingHoverClear, scheduleHoverClear],
   )
 
+  const setRange = useCallback(
+    (from, to) => {
+      cancelPendingHoverClear()
+      const [a, b] = orderRangeEdges(from, to).map(normalizeCalendarDate)
+      setStartDate(a)
+      setEndDate(b)
+      setHoverDate(null)
+    },
+    [cancelPendingHoverClear],
+  )
+
   return {
     startDate,
     endDate,
     hoverDate,
     onDateClick,
     onDateHover,
+    setRange,
   }
 }

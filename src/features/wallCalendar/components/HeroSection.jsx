@@ -1,7 +1,11 @@
+import { formatMonthYearHeading } from '../utils/calendarView.js'
+
 const HERO_IMAGE_URL =
   'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2400&q=80'
 
-export function HeroSection() {
+export function HeroSection({ year, month }) {
+  const title = formatMonthYearHeading(year, month)
+
   return (
     <header className="relative">
       <div className="relative h-40 w-full sm:h-52 lg:h-60">
@@ -18,8 +22,11 @@ export function HeroSection() {
           <p className="text-xs font-medium uppercase tracking-[0.24em] text-white/85">
             Wall Calendar
           </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-            April 2026
+          <h1
+            className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl"
+            aria-live="polite"
+          >
+            {title}
           </h1>
           <p className="mt-1 text-sm text-white/80">Minimal • Range-ready • Notes</p>
         </div>

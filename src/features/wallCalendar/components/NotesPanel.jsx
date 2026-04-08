@@ -1,14 +1,30 @@
-function NoteItem({ title, meta }) {
+import { useEffect, useMemo, useState } from 'react'
+import {
+  formatRangeLabel,
+  makeRangeKey,
+  parseNoteFields,
+  parseRangeKey,
+  previewNoteText,
+  serializeNoteFields,
+} from '../utils/rangeNotes.js'
+
+function SavedNoteRow({ noteKey, text, onEdit }) {
+  const parsed = parseRangeKey(noteKey)
+  const label =
+    parsed != null ? formatRangeLabel(parsed.start, parsed.end) : noteKey
+  const preview = previewNoteText(text)
+
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-zinc-300">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-zinc-900">{title}</p>
-          <p className="mt-1 text-xs text-zinc-500">{meta}</p>
+    <div className="rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</p>
+          <p className="mt-1 line-clamp-2 text-sm text-zinc-800">{preview || '—'}</p>
         </div>
         <button
           type="button"
-          className="rounded-lg px-2 py-1 text-xs font-medium text-zinc-600 transition hover:bg-zinc-50 hover:text-zinc-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20"
+          onClick={() => parsed && onEdit(parsed.start, parsed.end)}
+          className="shrink-0 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20"
         >
           Edit
         </button>
@@ -17,48 +33,162 @@ function NoteItem({ title, meta }) {
   )
 }
 
-export function NotesPanel() {
+export function NotesPanel({
+  startDate,
+  endDate,
+  notesByRangeKey,
+  onSaveNote,
+  onRemoveNote,
+  onSelectRange,
+}) {
+  const [summary, setSummary] = useState('')
+  const [details, setDetails] = useState('')
+
+  const hasFullRange = Boolean(startDate && endDate)
+  const rangeKey = hasFullRange ? makeRangeKey(startDate, endDate) : null
+  const existingRaw = rangeKey != null ? notesByRangeKey[rangeKey] ?? '' : ''
+
+  useEffect(() => {
+    if (!hasFullRange || rangeKey == null) {
+      setSummary('')
+      setDetails('')
+      return
+    }
+    const { summary: s, details: d } = parseNoteFields(notesByRangeKey[rangeKey] ?? '')
+    setSummary(s)
+    setDetails(d)
+  }, [hasFullRange, rangeKey, notesByRangeKey])
+
+  const savedEntries = useMemo(() => {
+    return Object.entries(notesByRangeKey)
+      .filter(([, v]) => String(v).trim() !== '')
+      .sort(([a], [b]) => a.localeCompare(b))
+  }, [notesByRangeKey])
+
+  const draftValue = serializeNoteFields(summary, details)
+  const dirty = hasFullRange && draftValue.trim() !== String(existingRaw).trim()
+
+  const handleSave = () => {
+    if (!rangeKey) return
+    onSaveNote?.(rangeKey, draftValue)
+  }
+
+  const handleRemove = () => {
+    if (!rangeKey) return
+    onRemoveNote?.(rangeKey)
+    setSummary('')
+    setDetails('')
+  }
+
+  const saveDisabled =
+    !hasFullRange ||
+    !dirty ||
+    (String(existingRaw).trim() === '' && draftValue.trim() === '')
+
   return (
     <section className="sticky top-6">
       <div className="rounded-3xl bg-zinc-50 p-5 ring-1 ring-zinc-950/5 sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h3 className="text-base font-semibold tracking-tight text-zinc-900">
-              Notes
-            </h3>
-            <p className="mt-1 text-sm text-zinc-500">
-              Attach details to a selected date range.
-            </p>
-          </div>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-xl bg-zinc-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20"
-          >
-            Add
-          </button>
-        </div>
-
-        <div className="mt-5 grid gap-3">
-          <NoteItem title="Team offsite" meta="Apr 8–10 · 2 notes" />
-          <NoteItem title="Dentist appointment" meta="Apr 14 · 9:30 AM" />
-          <NoteItem title="Pay rent" meta="Apr 1 · Reminder" />
-        </div>
-
-        <div className="mt-5 rounded-2xl border border-dashed border-zinc-300 bg-white/60 p-4">
-          <p className="text-sm font-medium text-zinc-900">Quick add</p>
+        <div>
+          <h3 className="text-base font-semibold tracking-tight text-zinc-900">Notes</h3>
           <p className="mt-1 text-sm text-zinc-500">
-            Select a range, then jot something down.
+            Select a date range, then add a short label and optional details.
           </p>
-          <div className="mt-3">
-            <textarea
-              className="min-h-24 w-full resize-none rounded-2xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-300 focus:ring-2 focus:ring-zinc-900/10"
-              placeholder="Add a note…"
-              disabled
-            />
-          </div>
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+          {!hasFullRange ? (
+            <p className="text-sm text-zinc-600">
+              Choose a <span className="font-medium text-zinc-800">start</span> and{' '}
+              <span className="font-medium text-zinc-800">end</span> date on the calendar to
+              attach a note.
+            </p>
+          ) : (
+            <>
+              <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                Selected range
+              </p>
+              <p className="mt-1 text-sm font-semibold text-zinc-900">
+                {formatRangeLabel(startDate, endDate)}
+              </p>
+
+              <div className="mt-4 space-y-3">
+                <div>
+                  <label
+                    className="mb-1 block text-xs font-medium text-zinc-600"
+                    htmlFor="note-summary"
+                  >
+                    Summary
+                  </label>
+                  <input
+                    id="note-summary"
+                    type="text"
+                    value={summary}
+                    onChange={(e) => setSummary(e.target.value)}
+                    placeholder="e.g. Trip planning"
+                    className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-300 focus:ring-2 focus:ring-zinc-900/10"
+                    autoComplete="off"
+                  />
+                </div>
+                <div>
+                  <label
+                    className="mb-1 block text-xs font-medium text-zinc-600"
+                    htmlFor="note-details"
+                  >
+                    Details <span className="font-normal text-zinc-400">(optional)</span>
+                  </label>
+                  <textarea
+                    id="note-details"
+                    value={details}
+                    onChange={(e) => setDetails(e.target.value)}
+                    placeholder="Flights, links, reminders…"
+                    rows={3}
+                    className="w-full resize-y rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-300 focus:ring-2 focus:ring-zinc-900/10"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={saveDisabled}
+                  className="inline-flex items-center justify-center rounded-xl bg-zinc-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/25 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Save note
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRemove}
+                  disabled={!hasFullRange || String(existingRaw).trim() === ''}
+                  className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Remove
+                </button>
+              </div>
+              {String(existingRaw).trim() !== '' && !dirty ? (
+                <p className="mt-3 text-xs text-zinc-500">Saved for this range. Edit fields to update.</p>
+              ) : null}
+            </>
+          )}
+        </div>
+
+        <div className="mt-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+            All notes ({savedEntries.length})
+          </p>
+          {savedEntries.length === 0 ? (
+            <p className="mt-2 text-sm text-zinc-500">No notes yet.</p>
+          ) : (
+            <ul className="mt-3 flex flex-col gap-2">
+              {savedEntries.map(([key, text]) => (
+                <li key={key}>
+                  <SavedNoteRow noteKey={key} text={text} onEdit={onSelectRange} />
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </section>
   )
 }
-

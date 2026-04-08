@@ -22,6 +22,7 @@ function DayCellInner({
   previewRole,
   showAnchorOnly,
   isToday,
+  hasNote,
 }) {
   const label = formatDayNumber(date)
   const { layer, role } = resolveVisualState({
@@ -104,18 +105,21 @@ function DayCellInner({
 
   const borderBase = layer === 'none' ? 'border' : ''
 
+  const ariaLabelBase = date.toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+  const ariaLabel = hasNote ? `${ariaLabelBase}. Has note.` : ariaLabelBase
+
   return (
     <button
       type="button"
       className={[baseInteractive, roundedByRole, borderBase, layerStyleClasses, todayRing]
         .filter(Boolean)
         .join(' ')}
-      aria-label={date.toLocaleDateString(undefined, {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })}
+      aria-label={ariaLabel}
       aria-pressed={isHighlighted}
       onClick={() => onDateClick?.(date)}
       onPointerEnter={() => onDateEnter?.(date)}
@@ -146,6 +150,16 @@ function DayCellInner({
           isHighlighted ? 'opacity-0' : 'bg-zinc-100/70 opacity-0 group-hover:opacity-100',
         ].join(' ')}
       />
+
+      {hasNote ? (
+        <span
+          className={[
+            'pointer-events-none absolute bottom-1.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-amber-500 shadow-sm transition-opacity duration-200',
+            labelLight ? 'ring-2 ring-white/70' : 'ring-2 ring-white',
+          ].join(' ')}
+          aria-hidden
+        />
+      ) : null}
     </button>
   )
 }
@@ -157,6 +171,7 @@ function propsAreEqual(prev, next) {
     prev.previewRole === next.previewRole &&
     prev.showAnchorOnly === next.showAnchorOnly &&
     prev.isToday === next.isToday &&
+    prev.hasNote === next.hasNote &&
     prev.onDateClick === next.onDateClick &&
     prev.onDateEnter === next.onDateEnter
   )
