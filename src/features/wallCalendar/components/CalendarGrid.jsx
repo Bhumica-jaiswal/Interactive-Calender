@@ -1,15 +1,10 @@
 import { DayCell } from './DayCell.jsx'
+import { buildCalendarMonth } from '../utils/buildCalendarMonth.js'
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-export function CalendarGrid() {
-  // Static placeholder days (no logic yet).
-  const days = Array.from({ length: 42 }, (_, i) => {
-    const dayNumber = i - 2 // creates a few "leading" days visually
-    const inMonth = dayNumber >= 1 && dayNumber <= 30
-    const label = inMonth ? String(dayNumber) : String(inMonth ? dayNumber : dayNumber <= 0 ? 30 + dayNumber : dayNumber - 30)
-    return { key: i, label, inMonth }
-  })
+export function CalendarGrid({ year, month }) {
+  const cells = buildCalendarMonth(year, month)
 
   return (
     <section className="mt-6">
@@ -25,11 +20,19 @@ export function CalendarGrid() {
       </div>
 
       <div className="mt-2 grid grid-cols-7 gap-2">
-        {days.map((day) => (
-          <DayCell key={day.key} label={day.label} inMonth={day.inMonth} />
-        ))}
+        {cells.map((cell) => {
+          if (cell.kind === 'padding') {
+            return (
+              <div
+                key={cell.key}
+                className="aspect-square w-full rounded-2xl border border-transparent bg-transparent"
+                aria-hidden="true"
+              />
+            )
+          }
+          return <DayCell key={cell.key} date={cell.date} />
+        })}
       </div>
     </section>
   )
 }
-

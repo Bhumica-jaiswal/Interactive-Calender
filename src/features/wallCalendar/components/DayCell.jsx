@@ -1,15 +1,24 @@
-export function DayCell({ label, inMonth }) {
+function formatDayNumber(date) {
+  return String(date.getDate())
+}
+
+export function DayCell({ date }) {
+  const label = formatDayNumber(date)
+
   return (
     <button
       type="button"
       className={[
-        'group relative flex aspect-square w-full flex-col items-start justify-between rounded-2xl border p-2 text-left shadow-sm transition',
+        'group relative flex aspect-square w-full flex-col items-start justify-between rounded-2xl border border-zinc-200 bg-white p-2 text-left shadow-sm transition',
+        'hover:border-zinc-300 hover:bg-zinc-50',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20',
-        inMonth
-          ? 'border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50'
-          : 'border-zinc-100 bg-zinc-50 text-zinc-400 hover:bg-zinc-100',
       ].join(' ')}
-      aria-label={`Day ${label}`}
+      aria-label={date.toLocaleDateString(undefined, {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })}
     >
       <div className="flex w-full items-center justify-between">
         <span className="text-sm font-semibold text-zinc-900/90 group-hover:text-zinc-900">
@@ -22,4 +31,3 @@ export function DayCell({ label, inMonth }) {
     </button>
   )
 }
-

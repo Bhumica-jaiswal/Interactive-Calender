@@ -3,6 +3,9 @@ import { CalendarHeader } from './CalendarHeader.jsx'
 import { CalendarGrid } from './CalendarGrid.jsx'
 import { NotesPanel } from './NotesPanel.jsx'
 
+const DEFAULT_YEAR = 2026
+const DEFAULT_MONTH = 4
+
 export function CalendarContainer() {
   return (
     <section className="mx-auto w-full max-w-6xl">
@@ -16,7 +19,7 @@ export function CalendarContainer() {
 
           <div className="order-1 lg:order-2">
             <CalendarHeader />
-            <CalendarGrid />
+            <CalendarGrid year={DEFAULT_YEAR} month={DEFAULT_MONTH} />
           </div>
         </div>
       </div>
